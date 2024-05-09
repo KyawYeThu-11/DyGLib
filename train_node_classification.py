@@ -114,7 +114,8 @@ if __name__ == "__main__":
         model = nn.Sequential(dynamic_backbone, link_predictor)
 
         # load the saved model in the link prediction task
-        load_model_folder = f"./saved_models/{args.model_name}/{args.dataset_name}/{args.load_model_name}"
+        load_model_folder = f"/content/MyDrive/CS471 Project/saved_models/{args.model_name}/{args.dataset_name}/{args.load_model_name}"
+        # load_model_folder = f"./saved_models/{args.model_name}/{args.dataset_name}/{args.load_model_name}"
         early_stopping = EarlyStopping(patience=0, save_model_folder=load_model_folder,
                                        save_model_name=args.load_model_name, logger=logger, model_name=args.model_name)
         early_stopping.load_checkpoint(model, map_location='cpu')
@@ -137,8 +138,10 @@ if __name__ == "__main__":
                 for node_raw_message in node_raw_messages:
                     new_node_raw_messages.append((node_raw_message[0].to(args.device), node_raw_message[1]))
                 model[0].memory_bank.node_raw_messages[node_id] = new_node_raw_messages
-
-        save_model_folder = f"./saved_models/{args.model_name}/{args.dataset_name}/{args.save_model_name}/"
+        
+        
+        save_model_folder = f"/content/MyDrive/CS471 Project/saved_models/{args.model_name}/{args.dataset_name}/{args.save_model_name}/"
+        # save_model_folder = f"./saved_models/{args.model_name}/{args.dataset_name}/{args.save_model_name}/"
         shutil.rmtree(save_model_folder, ignore_errors=True)
         os.makedirs(save_model_folder, exist_ok=True)
 
