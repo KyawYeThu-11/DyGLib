@@ -1,16 +1,55 @@
 import numpy as np
 import torch
 import torch.nn as nn
+import tqdm
 import torch.nn.functional as F
 from torch.nn import MultiheadAttention
+from utils.utils import get_neighbor_sampler
+from torch_geometric.nn import global_mean_pool
 
 from models.modules import TimeEncoder
 from utils.utils import NeighborSampler
 
+def _tensor2triplet(tensor, timepoints, threshold):
+  assert tensor.dim() == 3
 
-class DyGFormer(nn.Module):
+  timepoints = []
+  srcNodes = []
+  dstNodes = []
 
-    def __init__(self, node_raw_features: np.ndarray, edge_raw_features: np.ndarray, neighbor_sampler: NeighborSampler,
+  for j in range(tensor.shape[0]):
+    tensor2d = tensor[j]
+    quantile = torch.quantile(tensor2d, threshold)
+    adj2d = torch.where(tensor2d > quantile, 1.0, 0.0)
+    argW = torch.argwhere(adj2d)
+
+    for [u,v] in argW:
+      timepoints.append(j)
+      srcNodes.append(u.item())
+      dstNodes.append(v.item())
+
+  return timepoints, srcNodes, dstNodes
+
+class Data:
+
+    def __init__(self, src_node_ids: np.ndarray, dst_node_ids: np.ndarray, node_interact_times: np.ndarray, edge_ids: np.ndarray, labels: np.ndarray):
+        """
+        Data object to store the nodes interaction information.
+        :param src_node_ids: ndarray
+        :param dst_node_ids: ndarray
+        :param node_interact_times: ndarray
+        :param edge_ids: ndarray
+        :param labels: ndarray
+        """
+        self.src_node_ids = src_node_ids
+        self.dst_node_ids = dst_node_ids
+        self.node_interact_times = node_interact_times
+        self.num_interactions = len(src_node_ids)
+        self.unique_node_ids = set(src_node_ids) | set(dst_node_ids)
+        self.num_unique_nodes = len(self.unique_node_ids)
+
+class DyGFormer(nn.Module):        
+    def __init__(self, node_feat_dim: int, edge_feat_dim: int, neighbor_sampler: NeighborSampler,
                  time_feat_dim: int, channel_embedding_dim: int, patch_size: int = 1, num_layers: int = 2, num_heads: int = 2,
                  dropout: float = 0.1, max_input_sequence_length: int = 512, device: str = 'cpu'):
         """
@@ -29,12 +68,12 @@ class DyGFormer(nn.Module):
         """
         super(DyGFormer, self).__init__()
 
-        self.node_raw_features = torch.from_numpy(node_raw_features.astype(np.float32)).to(device)
-        self.edge_raw_features = torch.from_numpy(edge_raw_features.astype(np.float32)).to(device)
+        # self.node_raw_features = torch.from_numpy(node_raw_features.astype(np.float32)).to(device)
+        # self.edge_raw_features = torch.from_numpy(edge_raw_features.astype(np.float32)).to(device)
 
         self.neighbor_sampler = neighbor_sampler
-        self.node_feat_dim = self.node_raw_features.shape[1]
-        self.edge_feat_dim = self.edge_raw_features.shape[1]
+        self.node_feat_dim = node_feat_dim
+        self.edge_feat_dim = edge_feat_dim
         self.time_feat_dim = time_feat_dim
         self.channel_embedding_dim = channel_embedding_dim
         self.patch_size = patch_size
@@ -315,8 +354,28 @@ class DyGFormer(nn.Module):
         if self.neighbor_sampler.sample_neighbor_strategy in ['uniform', 'time_interval_aware']:
             assert self.neighbor_sampler.seed is not None
             self.neighbor_sampler.reset_random_state()
-
-
+            
+    def forward(self, a, sampling_endpoints):
+        # assumes shape [minibatch x time x node x node] for a
+        logit_list = []
+        for i, a_subject in enumerate(tqdm(a, desc=f'for subject {i}')):
+            timepoints, src_nodes, dst_nodes = _tensor2triplet(a_subject, sampling_endpoints, 1 - 0.3)
+            edge_raw_features = np.load('./processed_data/{}/ml_{}.npy'.format(dataset_name, dataset_name))
+            node_raw_features = np.load('./processed_data/{}/ml_{}_node.npy'.format(dataset_name, dataset_name))
+            # setting neighbor sampler
+            train_data = Data(src_node_ids=src_nodes, dst_node_ids=dst_nodes, node_interact_times=timepoints)
+            neighbor_sampler = get_neighbor_sampler(data=train_data, sample_neighbor_strategy=self.sample_neighbor_strategy,
+                                                  time_scaling_factor=self.time_scaling_factor, seed=0)
+            self.set_neighbor_sampler(neighbor_sampler)
+            
+            src_node_embeddings, dst_node_embeddings = self.compute_src_dst_node_temporal_embeddings(src_node_ids=src_nodes, dst_node_ids=dst_nodes, node_interact_times=timepoints)
+        
+            dummy_batch = torch.zeros(src_node_embeddings.shape[0], dtype=int).to(self.device)
+            graph_embedding = global_mean_pool(src_node_embeddings, dummy_batch)
+            logit = graph_embedding.mean()
+            logit_list.append(logit)
+        return np.array(logit_list)
+            
 class NeighborCooccurrenceEncoder(nn.Module):
 
     def __init__(self, neighbor_co_occurrence_feat_dim: int, device: str = 'cpu'):
