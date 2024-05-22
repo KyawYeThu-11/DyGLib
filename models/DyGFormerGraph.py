@@ -357,18 +357,20 @@ class DyGFormer(nn.Module):
             
     def forward(self, node_raw_features, edge_raw_features, src_node_ids, dst_node_ids, node_interact_times):
         # assumes shape [minibatch x time x node x node] for a
-            
+        print("JUST AHHHHHHHHHHHHHHHHh--------s")
         self.node_raw_features = torch.from_numpy(node_raw_features.astype(np.float32)).to(self.device)
         self.edge_raw_features = torch.from_numpy(edge_raw_features.astype(np.float32)).to(self.device)
-            
+        
+        print(f"device is {self.device} and node raw features are loaded on gpu")
         src_node_embeddings, dst_node_embeddings = self.compute_src_dst_node_temporal_embeddings(src_node_ids=src_node_ids, dst_node_ids=dst_node_ids, node_interact_times=node_interact_times)
         
+        print("done calculating node embeddings")
         dummy_batch = torch.zeros(src_node_embeddings.shape[0], dtype=int).to(self.device)
         graph_embedding = global_mean_pool(src_node_embeddings, dummy_batch)
         
         logit = graph_embedding.mean()
         
-        return np.array(logit.detach().cpu().numpy())
+        return logit.detach().cpu().numpy()
             
 class NeighborCooccurrenceEncoder(nn.Module):
 
