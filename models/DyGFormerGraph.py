@@ -355,26 +355,20 @@ class DyGFormer(nn.Module):
             assert self.neighbor_sampler.seed is not None
             self.neighbor_sampler.reset_random_state()
             
-    def forward(self, a, sampling_endpoints):
+    def forward(self, node_raw_features, edge_raw_features, src_node_ids, dst_node_ids, node_interact_times):
         # assumes shape [minibatch x time x node x node] for a
-        logit_list = []
-        for i, a_subject in enumerate(tqdm(a, desc=f'for subject {i}')):
-            timepoints, src_nodes, dst_nodes = _tensor2triplet(a_subject, sampling_endpoints, 1 - 0.3)
-            edge_raw_features = np.load('./processed_data/{}/ml_{}.npy'.format(dataset_name, dataset_name))
-            node_raw_features = np.load('./processed_data/{}/ml_{}_node.npy'.format(dataset_name, dataset_name))
-            # setting neighbor sampler
-            train_data = Data(src_node_ids=src_nodes, dst_node_ids=dst_nodes, node_interact_times=timepoints)
-            neighbor_sampler = get_neighbor_sampler(data=train_data, sample_neighbor_strategy=self.sample_neighbor_strategy,
-                                                  time_scaling_factor=self.time_scaling_factor, seed=0)
-            self.set_neighbor_sampler(neighbor_sampler)
             
-            src_node_embeddings, dst_node_embeddings = self.compute_src_dst_node_temporal_embeddings(src_node_ids=src_nodes, dst_node_ids=dst_nodes, node_interact_times=timepoints)
+        self.node_raw_features = torch.from_numpy(node_raw_features.astype(np.float32)).to(self.device)
+        self.edge_raw_features = torch.from_numpy(edge_raw_features.astype(np.float32)).to(self.device)
+            
+        src_node_embeddings, dst_node_embeddings = self.compute_src_dst_node_temporal_embeddings(src_node_ids=src_node_ids, dst_node_ids=dst_node_ids, node_interact_times=node_interact_times)
         
-            dummy_batch = torch.zeros(src_node_embeddings.shape[0], dtype=int).to(self.device)
-            graph_embedding = global_mean_pool(src_node_embeddings, dummy_batch)
-            logit = graph_embedding.mean()
-            logit_list.append(logit)
-        return np.array(logit_list)
+        dummy_batch = torch.zeros(src_node_embeddings.shape[0], dtype=int).to(self.device)
+        graph_embedding = global_mean_pool(src_node_embeddings, dummy_batch)
+        
+        logit = graph_embedding.mean()
+        
+        return np.array(logit.detach().cpu().numpy())
             
 class NeighborCooccurrenceEncoder(nn.Module):
 
