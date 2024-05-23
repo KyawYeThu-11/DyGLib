@@ -82,7 +82,7 @@ def reindex(df: pd.DataFrame, bipartite: bool = True):
     return new_df
 
 
-def preprocess_data(dataset_name: str, bipartite: bool = True, node_feat_dim: int = 172, save_dir: str = 'gdrive'):
+def preprocess_data(save_dir: str, read_dir: str, dataset_name: str, bipartite: bool = True, node_feat_dim: int = 172):
     """
     preprocess the data
     :param dataset_name: str, dataset name
@@ -91,7 +91,7 @@ def preprocess_data(dataset_name: str, bipartite: bool = True, node_feat_dim: in
     :return:
     """
     Path("../processed_data/{}/".format(dataset_name)).mkdir(parents=True, exist_ok=True)
-    PATH = '../DG_data/{}.csv'.format(dataset_name, dataset_name)
+    PATH = '../DG_data/{}/{}.csv'.format(read_dir, dataset_name, dataset_name)
     OUT_DF = '../processed_data/{}/ml_{}.csv'.format(dataset_name, dataset_name)
     OUT_FEAT = '../processed_data/{}/ml_{}.npy'.format(dataset_name, dataset_name)
     OUT_NODE_FEAT = '../processed_data/{}/ml_{}_node.npy'.format(dataset_name, dataset_name)
@@ -125,47 +125,15 @@ def preprocess_data(dataset_name: str, bipartite: bool = True, node_feat_dim: in
     np.save(OUT_NODE_FEAT, node_feats)  # node features
 
 
-def check_data(dataset_name: str):
-    """
-    check whether the processed datasets are identical to the given processed datasets
-    :param dataset_name: str, dataset name
-    :return:
-    """
-    # original data paths
-    origin_OUT_DF = '../DG_data/{}/ml_{}.csv'.format(dataset_name, dataset_name)
-    origin_OUT_FEAT = '../DG_data/{}/ml_{}.npy'.format(dataset_name, dataset_name)
-    origin_OUT_NODE_FEAT = '../DG_data/{}/ml_{}_node.npy'.format(dataset_name, dataset_name)
-
-    # processed data paths
-    OUT_DF = '../processed_data/{}/ml_{}.csv'.format(dataset_name, dataset_name)
-    OUT_FEAT = '../processed_data/{}/ml_{}.npy'.format(dataset_name, dataset_name)
-    OUT_NODE_FEAT = '../processed_data/{}/ml_{}_node.npy'.format(dataset_name, dataset_name)
-
-    # Load original data
-    origin_g_df = pd.read_csv(origin_OUT_DF)
-    origin_e_feat = np.load(origin_OUT_FEAT)
-    origin_n_feat = np.load(origin_OUT_NODE_FEAT)
-
-    # Load processed data
-    g_df = pd.read_csv(OUT_DF)
-    e_feat = np.load(OUT_FEAT)
-    n_feat = np.load(OUT_NODE_FEAT)
-
-    assert_frame_equal(origin_g_df, g_df)
-    # check numbers of edges and edge features
-    assert origin_e_feat.shape == e_feat.shape and origin_e_feat.max() == e_feat.max() and origin_e_feat.min() == e_feat.min()
-    # check numbers of nodes and node features
-    assert origin_n_feat.shape == n_feat.shape and origin_n_feat.max() == n_feat.max() and origin_n_feat.min() == n_feat.min()
-
-
 parser = argparse.ArgumentParser('Interface for preprocessing datasets')
 parser.add_argument('--dataset_name', type=str, help='Dataset name')
 parser.add_argument('--node_feat_dim', type=int, default=172, help='Number of node raw features')
 parser.add_argument('--check', type=bool, default=False, help='Check the processed data')
 parser.add_argument('--save_dir', type=str, default='gdrive', help='Save directory: Temporarily Imported Repo or Google Drive', choices=['gdrive', 'repo'])
+parser.add_argument('--read_dir', type=str, help='Dataset path')
 
 args = parser.parse_args()
 
 print(f'preprocess dataset {args.dataset_name}...')
-preprocess_data(dataset_name=args.dataset_name, bipartite=False, node_feat_dim=args.node_feat_dim, save_dir=args.save_dir)
+preprocess_data(save_dir=args.save_dir, read_dir=args.dataset_path. dataset_name=args.dataset_name, bipartite=False, node_feat_dim=args.node_feat_dim)
 print(f'{args.dataset_name} is processed successfully.')
