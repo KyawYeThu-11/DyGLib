@@ -82,7 +82,7 @@ def reindex(df: pd.DataFrame, bipartite: bool = True):
     return new_df
 
 
-def preprocess_data(save_dir: str, read_dir: str, dataset_name: str, bipartite: bool = True, node_feat_dim: int = 172):
+def preprocess_data(read_dir: str, save_dir: str, dataset_name: str, bipartite: bool = True, node_feat_dim: int = 172):
     """
     preprocess the data
     :param dataset_name: str, dataset name
@@ -90,12 +90,19 @@ def preprocess_data(save_dir: str, read_dir: str, dataset_name: str, bipartite: 
     :param node_feat_dim: int, dimension of node features
     :return:
     """
-    Path("../processed_data/{}/".format(dataset_name)).mkdir(parents=True, exist_ok=True)
-    PATH = '../DG_data/{}/{}.csv'.format(read_dir, dataset_name, dataset_name)
-    OUT_DF = '../processed_data/{}/ml_{}.csv'.format(dataset_name, dataset_name)
-    OUT_FEAT = '../processed_data/{}/ml_{}.npy'.format(dataset_name, dataset_name)
-    OUT_NODE_FEAT = '../processed_data/{}/ml_{}_node.npy'.format(dataset_name, dataset_name)
+    gdrive_path = 'Dataset/Preprocessed Data'
+    os.makedirs(os.path.join(gdrive_path, save_dir, dataset_name), exist_ok=True)
+    OUT_DF = os.path.join(gdrive_path, save_dir, dataset_name, 'ml_{}.csv'.format(dataset_name))
+    OUT_FEAT = os.path.join(gdrive_path, save_dir, dataset_name, 'ml_{}.npy'.format(dataset_name))
+    OUT_NODE_FEAT = os.path.join(gdrive_path, save_dir, dataset_name, 'ml_{}_node.npy'.format(dataset_name))
+    PATH = '/content/DG_data/{}/{}.csv'.format(read_dir, dataset_name)
 
+    # os.makedirs(os.path.join('../processed_data', save_dir, dataset_name), exist_ok=True)
+    # OUT_DF = os.path.join('../processed_data', save_dir, dataset_name, 'ml_{}.csv'.format(dataset_name))
+    # OUT_FEAT = os.path.join('../processed_data', save_dir, dataset_name, 'ml_{}.npy'.format(dataset_name))
+    # OUT_NODE_FEAT = os.path.join('../processed_data', save_dir, dataset_name, 'ml_{}_node.npy'.format(dataset_name))
+    # PATH = '../DG_data/{}/{}.csv'.format(read_dir, dataset_name)
+    
     df, edge_feats = preprocess(PATH)
     new_df = reindex(df, bipartite)
 
@@ -108,18 +115,7 @@ def preprocess_data(save_dir: str, read_dir: str, dataset_name: str, bipartite: 
     max_idx = max(new_df.u.max(), new_df.i.max())
     node_feats = np.zeros((max_idx + 1, node_feat_dim))
 
-    print('number of nodes ', node_feats.shape[0] - 1)
-    print('number of node features ', node_feats.shape[1])
-    print('number of edges ', edge_feats.shape[0] - 1)
-    print('number of edge features ', edge_feats.shape[1])
 
-    if save_dir == 'gdrive':
-        gdrive_path = '/content/drive/MyDrive/CS471 Project/Dataset/Preprocessed data'
-        os.makedirs(gdrive_path, exist_ok=True)
-        OUT_DF = os.path.join(gdrive_path, '{}/ml_{}.csv'.format(dataset_name, dataset_name))
-        OUT_FEAT = os.path.join(gdrive_path, '{}/ml_{}.npy'.format(dataset_name, dataset_name))
-        OUT_NODE_FEAT = os.path.join(gdrive_path, '{}/ml_{}_node.npy'.format(dataset_name, dataset_name))
-        
     new_df.to_csv(OUT_DF)  # edge-list
     np.save(OUT_FEAT, edge_feats)  # edge features
     np.save(OUT_NODE_FEAT, node_feats)  # node features
@@ -135,5 +131,5 @@ parser.add_argument('--read_dir', type=str, help='Dataset path')
 args = parser.parse_args()
 
 print(f'preprocess dataset {args.dataset_name}...')
-preprocess_data(save_dir=args.save_dir, read_dir=args.dataset_path. dataset_name=args.dataset_name, bipartite=False, node_feat_dim=args.node_feat_dim)
+preprocess_data(save_dir=args.save_dir, read_dir=args.read_dir, dataset_name=args.dataset_name, bipartite=False, node_feat_dim=args.node_feat_dim)
 print(f'{args.dataset_name} is processed successfully.')

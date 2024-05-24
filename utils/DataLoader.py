@@ -2,6 +2,7 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import random
 import pandas as pd
+import os
 
 
 class CustomizedDataset(Dataset):
@@ -175,7 +176,7 @@ def get_link_prediction_data(dataset_name: str, val_ratio: float, test_ratio: fl
     return node_raw_features, edge_raw_features, full_data, train_data, val_data, test_data, new_node_val_data, new_node_test_data
 
 
-def get_node_classification_data(dataset_name: str, val_ratio: float, test_ratio: float):
+def get_node_classification_data(dataset_name: str, subject_id: int, val_ratio: float, test_ratio: float):
     """
     generate data for node classification task
     :param dataset_name: str, dataset name
@@ -185,9 +186,9 @@ def get_node_classification_data(dataset_name: str, val_ratio: float, test_ratio
             full_data, train_data, val_data, test_data, (Data object)
     """
     # Load data and train val test split
-    graph_df = pd.read_csv('./processed_data/{}/ml_{}.csv'.format(dataset_name, dataset_name))
-    edge_raw_features = np.load('./processed_data/{}/ml_{}.npy'.format(dataset_name, dataset_name))
-    node_raw_features = np.load('./processed_data/{}/ml_{}_node.npy'.format(dataset_name, dataset_name))
+    graph_df = pd.read_csv(os.path.join(dataset_name, f'ml_{subject_id}.csv'))
+    edge_raw_features = np.load(os.path.join(dataset_name, f'ml_{subject_id}.npy'))
+    node_raw_features = np.load(os.path.join(dataset_name, f'ml_{subject_id}_node.npy'))
 
     NODE_FEAT_DIM = EDGE_FEAT_DIM = 172
     assert NODE_FEAT_DIM >= node_raw_features.shape[1], f'Node feature dimension in dataset {dataset_name} is bigger than {NODE_FEAT_DIM}!'
