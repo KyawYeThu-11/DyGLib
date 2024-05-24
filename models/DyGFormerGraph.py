@@ -29,7 +29,6 @@ class DyGFormer(nn.Module):
         """
         super(DyGFormer, self).__init__()
 
-        self.neighbor_sampler = neighbor_sampler
         self.node_feat_dim = node_feat_dim
         self.edge_feat_dim = edge_feat_dim
         self.time_feat_dim = time_feat_dim
@@ -313,11 +312,12 @@ class DyGFormer(nn.Module):
             assert self.neighbor_sampler.seed is not None
             self.neighbor_sampler.reset_random_state()
             
-    def forward(self, node_raw_features, edge_raw_features, src_node_ids, dst_node_ids, node_interact_times):
+    def forward(self, node_raw_features, edge_raw_features, full_neighbor_sampler, src_node_ids, dst_node_ids, node_interact_times):
         # assumes shape [minibatch x time x node x node] for a
         self.node_raw_features = torch.from_numpy(node_raw_features.astype(np.float32)).to(self.device)
         self.edge_raw_features = torch.from_numpy(edge_raw_features.astype(np.float32)).to(self.device)
-
+        self.neighbor_sampler = full_neighbor_sampler
+        
         src_node_embeddings, dst_node_embeddings = self.compute_src_dst_node_temporal_embeddings(src_node_ids=src_node_ids, dst_node_ids=dst_node_ids, node_interact_times=node_interact_times)
 
         dummy_batch = torch.zeros(src_node_embeddings.shape[0], dtype=int).to(self.device)
