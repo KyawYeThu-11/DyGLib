@@ -10,7 +10,7 @@ from models.modules import TimeEncoder
 from utils.utils import NeighborSampler
 
 class DyGFormer(nn.Module):        
-    def __init__(self, node_feat_dim: int, edge_feat_dim: int, neighbor_sampler: NeighborSampler,
+    def __init__(self, node_feat_dim: int, edge_feat_dim: int,
                  time_feat_dim: int, channel_embedding_dim: int, patch_size: int = 1, num_layers: int = 2, num_heads: int = 2,
                  dropout: float = 0.1, max_input_sequence_length: int = 512, device: str = 'cpu'):
         """
@@ -312,16 +312,17 @@ class DyGFormer(nn.Module):
             assert self.neighbor_sampler.seed is not None
             self.neighbor_sampler.reset_random_state()
             
-    def forward(self, node_raw_features, edge_raw_features, full_neighbor_sampler, src_node_ids, dst_node_ids, node_interact_times):
+    def forward(self, node_raw_features, edge_raw_features, src_node_ids, dst_node_ids, node_interact_times):
         # assumes shape [minibatch x time x node x node] for a
         self.node_raw_features = torch.from_numpy(node_raw_features.astype(np.float32)).to(self.device)
         self.edge_raw_features = torch.from_numpy(edge_raw_features.astype(np.float32)).to(self.device)
-        self.neighbor_sampler = full_neighbor_sampler
         
         src_node_embeddings, dst_node_embeddings = self.compute_src_dst_node_temporal_embeddings(src_node_ids=src_node_ids, dst_node_ids=dst_node_ids, node_interact_times=node_interact_times)
-
-        dummy_batch = torch.zeros(src_node_embeddings.shape[0], dtype=int).to(self.device)
-        graph_embedding = global_mean_pool(src_node_embeddings, dummy_batch)
+        
+        mean_node_embeddings = torch.mean(torch.stack([src_node_embeddings, dst_node_embeddings]), dim=0)
+        
+        dummy_batch = torch.zeros(mean_node_embeddings.shape[0], dtype=int).to(self.device)
+        graph_embedding = global_mean_pool(mean_node_embeddings, dummy_batch)
 
 
         return graph_embedding.detach().cpu().numpy()
