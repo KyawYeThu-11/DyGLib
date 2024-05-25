@@ -20,11 +20,11 @@ class EarlyStopping(object):
         self.best_metrics = {}
         self.early_stop = False
         self.logger = logger
-        self.save_model_path = os.path.join(save_model_folder, f"{save_model_name}.pkl")
+        self.save_model_path = os.path.join(save_model_folder, f"{save_model_name}.pth")
         self.model_name = model_name
         if self.model_name in ['JODIE', 'DyRep', 'TGN']:
             # path to additionally save the nonparametric data (e.g., tensors) in memory-based models (e.g., JODIE, DyRep, TGN)
-            self.save_model_nonparametric_data_path = os.path.join(save_model_folder, f"{save_model_name}_nonparametric_data.pkl")
+            self.save_model_nonparametric_data_path = os.path.join(save_model_folder, f"{save_model_name}_nonparametric_data.pth")
 
     def step(self, metrics: list, model: nn.Module):
         """
