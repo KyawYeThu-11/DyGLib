@@ -67,6 +67,29 @@ class MergeLayer(nn.Module):
         h = self.fc2(self.act(self.fc1(x)))
         return h
 
+class GraphRegressor(nn.Module):
+  def __init__(self, in_channels: int, hidden_channels: int, out_channels: int):
+    super().__init__()
+    self.conv1 = nn.Conv1d(in_channels=in_channels, out_channels=hidden_channels, kernel_size=3, stride=1, padding=1)
+    self.conv2 = nn.Conv1d(in_channels=hidden_channels, out_channels=out_channels, kernel_size=3, stride=1, padding=1)
+
+    self.fc1 = nn.Linear(out_channels, 1)
+    self.act = nn.ReLU()
+
+  def forward(self, x):
+    # reshape input to [channels, sequence_length]
+    x = x.transpose(0, 1)
+
+    # Apply convolutional layers
+    x = self.act(self.conv1(x))
+    x = self.act(self.conv2(x))
+
+    # Apply global mean pooling
+    x = torch.mean(x, dim=1)
+
+    x = self.fc1(x)
+
+    return x
 
 class MLPClassifier(nn.Module):
     def __init__(self, input_dim: int, dropout: float = 0.1):

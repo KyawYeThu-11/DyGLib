@@ -3,13 +3,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import MultiheadAttention
-from utils.utils import get_neighbor_sampler
 from torch_geometric.nn import global_mean_pool
 
 from models.modules import TimeEncoder
 from utils.utils import NeighborSampler
 
-class DyGFormer(nn.Module):        
+class DyGFormerGraph(nn.Module):        
     def __init__(self, node_feat_dim: int, edge_feat_dim: int,
                  time_feat_dim: int, channel_embedding_dim: int, patch_size: int = 1, num_layers: int = 2, num_heads: int = 2,
                  dropout: float = 0.1, max_input_sequence_length: int = 512, device: str = 'cpu'):
@@ -27,7 +26,7 @@ class DyGFormer(nn.Module):
         :param max_input_sequence_length: int, maximal length of the input sequence for each node
         :param device: str, device
         """
-        super(DyGFormer, self).__init__()
+        super(DyGFormerGraph, self).__init__()
 
         self.node_feat_dim = node_feat_dim
         self.edge_feat_dim = edge_feat_dim
