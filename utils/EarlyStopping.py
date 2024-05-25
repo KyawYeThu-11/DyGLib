@@ -26,7 +26,7 @@ class EarlyStopping(object):
             # path to additionally save the nonparametric data (e.g., tensors) in memory-based models (e.g., JODIE, DyRep, TGN)
             self.save_model_nonparametric_data_path = os.path.join(save_model_folder, f"{save_model_name}_nonparametric_data.pth")
 
-    def step(self, metrics: list, model: nn.Module):
+    def step(self, metrics: list, epoch: int, model: nn.Module):
         """
         execute the early stop strategy for each evaluation process
         :param metrics: list, list of metrics, each element is a tuple (str, float, boolean) -> (metric_name, metric_value, whether higher means better)
@@ -52,6 +52,7 @@ class EarlyStopping(object):
             for metric_tuple in metrics:
                 metric_name, metric_value = metric_tuple[0], metric_tuple[1]
                 self.best_metrics[metric_name] = metric_value
+            model.state_dict()['epoch'] = epoch
             self.save_checkpoint(model)
             self.counter = 0
         # metrics are not better at the epoch
