@@ -78,7 +78,7 @@ class EarlyStopping(object):
         if self.model_name in ['JODIE', 'DyRep', 'TGN']:
             torch.save(model[0].memory_bank.node_raw_messages, self.save_model_nonparametric_data_path)
 
-    def load_checkpoint(self, model: nn.Module, map_location: str = None):
+    def load_checkpoint(self, model: nn.Module, checkpoint):
         """
         load model at self.save_model_path
         :param model: nn.Module
@@ -86,6 +86,7 @@ class EarlyStopping(object):
         :return:
         """
         self.logger.info(f"load model {self.save_model_path}")
-        model.load_state_dict(torch.load(self.save_model_path, map_location=map_location))
+        model.load_state_dict(checkpoint['model_state_dict'])
+        # model.load_state_dict(torch.load(self.save_model_path, map_location=map_location))
         if self.model_name in ['JODIE', 'DyRep', 'TGN']:
-            model[0].memory_bank.node_raw_messages = torch.load(self.save_model_nonparametric_data_path, map_location=map_location)
+            model[0].memory_bank.node_raw_messages = torch.load(self.save_model_nonparametric_data_path)
