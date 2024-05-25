@@ -52,8 +52,7 @@ class EarlyStopping(object):
             for metric_tuple in metrics:
                 metric_name, metric_value = metric_tuple[0], metric_tuple[1]
                 self.best_metrics[metric_name] = metric_value
-            model.state_dict()['epoch'] = epoch
-            self.save_checkpoint(model)
+            self.save_checkpoint(epoch, model)
             self.counter = 0
         # metrics are not better at the epoch
         else:
@@ -63,14 +62,19 @@ class EarlyStopping(object):
 
         return self.early_stop
 
-    def save_checkpoint(self, model: nn.Module):
+    def save_checkpoint(self, epoch, model: nn.Module):
         """
         saves model at self.save_model_path
         :param model: nn.Module
         :return:
         """
         self.logger.info(f"save model {self.save_model_path}")
-        torch.save(model.state_dict(), self.save_model_path)
+        
+        torch.save({
+            'epoch': epoch,
+            'model_state_dict': model.state_dict()
+        }, self.save_model_path)
+        
         if self.model_name in ['JODIE', 'DyRep', 'TGN']:
             torch.save(model[0].memory_bank.node_raw_messages, self.save_model_nonparametric_data_path)
 
