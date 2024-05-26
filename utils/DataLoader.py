@@ -176,19 +176,19 @@ def get_link_prediction_data(dataset_name: str, val_ratio: float, test_ratio: fl
     return node_raw_features, edge_raw_features, full_data, train_data, val_data, test_data, new_node_val_data, new_node_test_data
 
 
-def get_node_classification_data(dataset_name: str, subject_id: int, val_ratio: float, test_ratio: float):
+def get_graph_regression_data(dataset_name: str):
     """
     generate data for node classification task
     :param dataset_name: str, dataset name
     :param val_ratio: float, validation data ratio
     :param test_ratio: float, test data ratio
     :return: node_raw_features, edge_raw_features, (np.ndarray),
-            full_data, train_data, val_data, test_data, (Data object)
+            full_data (Data object)
     """
     # Load data and train val test split
-    graph_df = pd.read_csv(os.path.join(dataset_name, f'ml_{subject_id}.csv'))
-    edge_raw_features = np.load(os.path.join(dataset_name, f'ml_{subject_id}.npy'))
-    node_raw_features = np.load(os.path.join(dataset_name, f'ml_{subject_id}_node.npy'))
+    graph_df = pd.read_csv(os.path.join(dataset_name, f'ml_{dataset_name}.csv'))
+    edge_raw_features = np.load(os.path.join(dataset_name, f'ml_{dataset_name}.npy'))
+    node_raw_features = np.load(os.path.join(dataset_name, f'ml_{dataset_name}_node.npy'))
 
     NODE_FEAT_DIM = EDGE_FEAT_DIM = 172
     assert NODE_FEAT_DIM >= node_raw_features.shape[1], f'Node feature dimension in dataset {dataset_name} is bigger than {NODE_FEAT_DIM}!'
@@ -203,8 +203,6 @@ def get_node_classification_data(dataset_name: str, subject_id: int, val_ratio: 
 
     assert NODE_FEAT_DIM == node_raw_features.shape[1] and EDGE_FEAT_DIM == edge_raw_features.shape[1], 'Unaligned feature dimensions after feature padding!'
 
-    # get the timestamp of validate and test set
-    val_time, test_time = list(np.quantile(graph_df.ts, [(1 - val_ratio - test_ratio), (1 - test_ratio)]))
 
     src_node_ids = graph_df.u.values.astype(np.longlong)
     dst_node_ids = graph_df.i.values.astype(np.longlong)
@@ -215,17 +213,6 @@ def get_node_classification_data(dataset_name: str, subject_id: int, val_ratio: 
     # The setting of seed follows previous works
     random.seed(2020)
 
-    train_mask = node_interact_times <= val_time
-    val_mask = np.logical_and(node_interact_times <= test_time, node_interact_times > val_time)
-    test_mask = node_interact_times > test_time
-
     full_data = Data(src_node_ids=src_node_ids, dst_node_ids=dst_node_ids, node_interact_times=node_interact_times, edge_ids=edge_ids, labels=labels)
-    train_data = Data(src_node_ids=src_node_ids[train_mask], dst_node_ids=dst_node_ids[train_mask],
-                      node_interact_times=node_interact_times[train_mask],
-                      edge_ids=edge_ids[train_mask], labels=labels[train_mask])
-    val_data = Data(src_node_ids=src_node_ids[val_mask], dst_node_ids=dst_node_ids[val_mask],
-                    node_interact_times=node_interact_times[val_mask], edge_ids=edge_ids[val_mask], labels=labels[val_mask])
-    test_data = Data(src_node_ids=src_node_ids[test_mask], dst_node_ids=dst_node_ids[test_mask],
-                     node_interact_times=node_interact_times[test_mask], edge_ids=edge_ids[test_mask], labels=labels[test_mask])
 
-    return node_raw_features, edge_raw_features, full_data, train_data, val_data, test_data
+    return node_raw_features, edge_raw_features, full_data
