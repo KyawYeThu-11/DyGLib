@@ -176,19 +176,19 @@ def get_link_prediction_data(dataset_name: str, val_ratio: float, test_ratio: fl
     return node_raw_features, edge_raw_features, full_data, train_data, val_data, test_data, new_node_val_data, new_node_test_data
 
 
-def get_graph_regression_data(dataset_name: str):
+def get_graph_regression_data(dataset_dir: str, index: int):
     """
     generate data for node classification task
-    :param dataset_name: str, dataset name
+    :param dataset_dir: str, dataset name
     :param val_ratio: float, validation data ratio
     :param test_ratio: float, test data ratio
     :return: node_raw_features, edge_raw_features, (np.ndarray),
             full_data (Data object)
     """
     # Load data and train val test split
-    graph_df = pd.read_csv(os.path.join(dataset_name, f'ml_{dataset_name}.csv'))
-    edge_raw_features = np.load(os.path.join(dataset_name, f'ml_{dataset_name}.npy'))
-    node_raw_features = np.load(os.path.join(dataset_name, f'ml_{dataset_name}_node.npy'))
+    graph_df = pd.read_csv(os.path.join(dataset_dir, f'ml_{index}.csv'))
+    edge_raw_features = np.load(os.path.join(dataset_dir, f'ml_{index}.npy'))
+    node_raw_features = np.load(os.path.join(dataset_dir, f'ml_{index}_node.npy'))
 
     NODE_FEAT_DIM = EDGE_FEAT_DIM = 172
     assert NODE_FEAT_DIM >= node_raw_features.shape[1], f'Node feature dimension in dataset {dataset_name} is bigger than {NODE_FEAT_DIM}!'
