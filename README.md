@@ -1,9 +1,13 @@
 # KAIST 2024 Spring CS471: Graph Machine Learning and Mining
 Project Team #14: Dynamic Brain Connectome Learning by 20190169 Junyup Kim & 20220929 Kyaw Ye Thu
 
+Github: https://github.com/KyawYeThu-11/DyGLib
+
 ## Introduction
 This project aims to learn brain connectome data via an existing dynamic graph learning method, named DyGFormer [[2](#2)]. We've constructed a functional connectivity (FC) matrix with a functional magnetic resonance imaging (fMRI) images, by slightly modifying the approach in [[1](#1)].
+
 ![](./figures/rois.png)
+
 We've conducted two downstream tasks, **link prediction** and **graph regression**.  
 - The result showed that the DyGFormer model successfully predicted the future links in a dynamic graph, even with a novel connectome dataset.  
 - Also, the graph regression task suggested that DyGFormer model can generate a graph embedding that captures the dynamic features of brain connectome data.  
@@ -56,9 +60,14 @@ The goal of this task is to predict the **language task score** (output) of a su
 
 
 ## Notes
-We chose not to include the raw fMRI image files (in the format of `.nii.gz`) in the submission since there are 50 raw images each with the size of around 250MB. It would take a lot of time to unzip the files and upload it on Google Colab environment. Therefore, we omitted the code for loading the raw fMRI image, generating a functional connectivity (FC) matrix and a binary adjacency matrix. The .csv files in DG_data folder contains the information of each edge in the binary adjacency matrices.  
+- You can directly see our results by running the cells under `Testing` sections of the two training notebooks with the checkpoints from `saved_models` folder after running necessary cells. 
+- Our code can be run either using CPU or GPU although we trained our models with GPU. 
+    - We ensured that the session doesn't crash due to memory overflow, but if it happens, please restart the session and train again.
+    - If you train the models, note that `load_checkpoint` parameter is `False` by default. 
 
-If you have any further inquiries about preprocessing fMRI images, please contact Junyup Kim (ytrewq271828@kaist.ac.kr).  
+- We chose not to include the raw fMRI image files (in the format of `.nii.gz`) in the submission since there are 50 raw images each with the size of around 250MB. It would take a lot of time to unzip the files and upload it on Google Colab environment. Hence, to generate data by yourself using `Dataset.ipynb`, please add a shortcut to our folder, [CS471 Project](https://drive.google.com/drive/folders/1VMn57KmlJ20DlviBlGufDC7vgdWIR9ni?usp=sharing), to your own drive first. The details are described in the notebook.  
+
+- If you have any further inquiries about preprocessing fMRI images, please contact Junyup Kim (ytrewq271828@kaist.ac.kr) or Kyaw Ye Thu (kyawyethu@kaist.ac.kr).  
 
 ## References
 [<a name="1">1</a>] Learning dynamic graph representation of brain connectome with spatio-temporal attention, Kim et al., NeurIPS 2021.   
