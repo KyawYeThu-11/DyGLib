@@ -1,4 +1,4 @@
-##KAIST 2024 Spring CS471: Graph Machine Learning and Mining
+## KAIST 2024 Spring CS471: Graph Machine Learning and Mining
 Project Team #14: Dynamic Brain Connectome Learning by 20190169 Junyup Kim & 20220929 Kyaw Ye Thu
 
 ## Introduction
