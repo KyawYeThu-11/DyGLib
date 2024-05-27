@@ -10,7 +10,9 @@ This project aims to learn brain connectome data via an existing dynamic graph l
 
 We've conducted two downstream tasks, **link prediction** and **graph regression**.  
 - The result showed that the DyGFormer model successfully predicted the future links in a dynamic graph, even with a novel connectome dataset.  
-- Also, the graph regression task suggested that DyGFormer model can generate a graph embedding that captures the dynamic features of brain connectome data.  
+- Also, the graph regression task suggested that DyGFormer model can generate a graph embedding that captures the dynamic features of brain connectome data. 
+
+Hence, the novelty of our project are two folds: (1) applying DyGFormer to a novel connectome dataset and (2) extending DyGFormer for graph-level prediction tasks
 
 ## Data Generation
 We've generated dynamic graphs from raw fMRI images. The raw fMRI images are "100 unrelated subjects" version of HCP Young Adult Dataset [[3](#3)]. We specifically downloaded the language task fMRI dataset, which was measured while a subject is conducting a Language Task [[4](#4)]. However, due to the computational cost, we decided to use data from 50 subjects.  
