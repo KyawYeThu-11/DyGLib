@@ -109,5 +109,3 @@ ENV/
 
 # data
 .vscode/
-DG_data/*/*
-!DG_data/myket/*
