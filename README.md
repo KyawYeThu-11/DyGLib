@@ -2,7 +2,7 @@
 Project Team #14: Dynamic Brain Connectome Learning by 20190169 Junyup Kim & 20220929 Kyaw Ye Thu
 
 ## Introduction
-This project aims to learn brain connectome data via an existing dynamic graph learning method, named DyGFormer[2].  
+This project aims to learn brain connectome data via an existing dynamic graph learning method, named DyGFormer [2].  
 We've constructed a functional connectivity (FC) matrix with a functional magnetic resonance imaging (fMRI) images, by slightly modifying the approach in [1]  
 We've conducted 2 downstream tasks - one for graph regression, the other for link prediction.  
 The result showed that the DyGFormer model successfully predicted the future links in a dynamic graph, even with a novel connectome dataset.  
@@ -10,8 +10,8 @@ Also the graph regression task suggested that DyGFormer model can generate a gra
   
 ## Details
 We've generated a dynamic graph with raw fMRI images.  
-The raw fMRI images are "100 unrelated subjects" version of HCP Young Adult Dataset[3].  
-We specifically downnloaded the language task fMRI dataset, which was measured while a subject is conducting a Language Task[4].  
+The raw fMRI images are "100 unrelated subjects" version of HCP Young Adult Dataset [3].  
+We specifically downnloaded the language task fMRI dataset, which was measured while a subject is conducting a Language Task [4].  
 However, due to the computational cost, we decided to use data from 50 subjects.  
 
 We've generated a binary adjacency matrix from a functional connectivity (FC) matrix for each subject.  
@@ -49,7 +49,7 @@ train_link_prediction.ipynb - This .ipynb file trains a DyGFormer model for the 
 
 ## Notes
 We chose not to include the raw fMRI image files (in the format of .nii.gz) in the submission  
-since there are 50 raw images each with around the size of 250MB.  
+since there are 50 raw images each with the size of around 250MB.  
 We thought it would take a lot of time to unzip the files and upload it on Google Colab environment.  
 Therefore, we omitted the code for loading the raw fMRI image, generating a functional connectivity (FC) matrix and a binary adjacency matrix.  
 The .csv files in DG_data folder contains the information of each edge in the binary adjacency matrices.  
