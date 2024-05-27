@@ -2,70 +2,70 @@
 Project Team #14: Dynamic Brain Connectome Learning by 20190169 Junyup Kim & 20220929 Kyaw Ye Thu
 
 ## Introduction
-This project aims to learn brain connectome data via an existing dynamic graph learning method, named DyGFormer[2].
-We've constructed a functional connectivity (FC) matrix with a functional magnetic resonance imaging (fMRI) images, by slightly modifying the approach in [1]
-We've conducted 2 downstream tasks - one for graph regression, the other for link prediction.
-The result showed that the DyGFormer model successfully predicted the future links in a dynamic graph, even with a novel connectome dataset.
-Also the graph regression task suggested that DyGFormer model can generate a graph embedding that captures the dynamic features of brain connectome data.
-
+This project aims to learn brain connectome data via an existing dynamic graph learning method, named DyGFormer[2].  
+We've constructed a functional connectivity (FC) matrix with a functional magnetic resonance imaging (fMRI) images, by slightly modifying the approach in [1]  
+We've conducted 2 downstream tasks - one for graph regression, the other for link prediction.  
+The result showed that the DyGFormer model successfully predicted the future links in a dynamic graph, even with a novel connectome dataset.  
+Also the graph regression task suggested that DyGFormer model can generate a graph embedding that captures the dynamic features of brain connectome data.  
+  
 ## Details
-We've generated a dynamic graph with raw fMRI images.
-The raw fMRI images are "100 unrelated subjects" version of HCP Young Adult Dataset[3].
-We specifically downnloaded the language task fMRI dataset, which was measured while a subject is conducting a Language Task[4].
-However, due to the computational cost, we decided to use data from 50 subjects.
+We've generated a dynamic graph with raw fMRI images.  
+The raw fMRI images are "100 unrelated subjects" version of HCP Young Adult Dataset[3].  
+We specifically downnloaded the language task fMRI dataset, which was measured while a subject is conducting a Language Task[4].  
+However, due to the computational cost, we decided to use data from 50 subjects.  
 
-We've generated a binary adjacency matrix from a functional connectivity (FC) matrix for each subject.
-The FC matrix was constructed following the sliding-window approach in [1].
-We set the parameter values (length of window and starting points) to capture connectivity in 50 timepoints.
-We extracted top 5-percentile values of FC matrix to construct the binary adjacency matrix.
-Since the number of nodes in our brain graph is 400, the preprocessed data has a shape of (50, 50, 400, 400), with each adjacency matrix having 8000 edges.
-And we transformed the preprocessed data into 5-tuples and finally into .csv files , for the ease of feeding the data into the DyGFormer model.
+We've generated a binary adjacency matrix from a functional connectivity (FC) matrix for each subject.  
+The FC matrix was constructed following the sliding-window approach in [1].  
+We set the parameter values (length of window and starting points) to capture connectivity in 50 timepoints.  
+We extracted top 5-percentile values of FC matrix to construct the binary adjacency matrix.  
+Since the number of nodes in our brain graph is 400, the preprocessed data has a shape of (50, 50, 400, 400), with each adjacency matrix having 8000 edges.  
+And we transformed the preprocessed data into 5-tuples and finally into .csv files , for the ease of feeding the data into the DyGFormer model.  
 
-For each subject, we divided the 5-tuples in the preprocessed data into batches.
-And those batched data are fed into the DyGFormer model, resulting in a batchwise source node embedding and destination node embedding.
-Then the mean of the 2 embeddings are regarded as a batch graph embedding.
-Finally, the batch graph embeddings undergo mean pooling, resulting in a graph embedding for each timepoint.
+For each subject, we divided the 5-tuples in the preprocessed data into batches.  
+And those batched data are fed into the DyGFormer model, resulting in a batchwise source node embedding and destination node embedding.  
+Then the mean of the 2 embeddings are regarded as a batch graph embedding.  
+Finally, the batch graph embeddings undergo mean pooling, resulting in a graph embedding for each timepoint.  
 
 ## Graph regression task
-The graph regression task aims to predict a language task score of each subject.
-There are 50 graph embeddings for each subject, since there are 50 timepoints.
-We've fed the graph embeddings vector into a simple CNN model, named "GraphRegressor"
-The loss is calculated as a mean squared error loss between the result of GraphRegressor model and language scores.
+The graph regression task aims to predict a language task score of each subject.  
+There are 50 graph embeddings for each subject, since there are 50 timepoints.  
+We've fed the graph embeddings vector into a simple CNN model, named "GraphRegressor".  
+The loss is calculated as a mean squared error loss between the result of GraphRegressor model and language scores.  
 
 ## Link prediction task
 
 ## Folders
-DG_data - This folder contains the raw dataset in the format of .csv files.
-models - This folder contains the models in the format of .py files.
-preprocess_data - This folder contains the code for preprocessing the raw dataset in DG_data folder.
-preprocessed_data - This folder contains the preprocessed dataset, which can be directly fed into the model, in the format of .csv files.
-saved_models - This folder contains the saved models for each run. The numbers represent the index of repeated runs.
-utils - This folder contains the code used for utility in our model and training. Originally from [2].
+DG_data - This folder contains the raw dataset in the format of .csv files.  
+models - This folder contains the models in the format of .py files.  
+preprocess_data - This folder contains the code for preprocessing the raw dataset in DG_data folder.  
+preprocessed_data - This folder contains the preprocessed dataset, which can be directly fed into the model, in the format of .csv files.  
+saved_models - This folder contains the saved models for each run. The numbers represent the index of repeated runs.  
+utils - This folder contains the code used for utility in our model and training. Originally from [2].  
 
 ## Files
-Dataset.ipynb - This .ipynb file generates a brain connectome dataset with files downloaded from [3].
-train_graph_regression.ipynb - This .ipynb file trains a DyGFormer model for the graph regression task with the dataset generated by Dataset.ipynb.
-train_link_prediction.ipynb - This .ipynb file trains a DyGFormer model for the link predictiont task with the same dataset.
+Dataset.ipynb - This .ipynb file generates a brain connectome dataset with files downloaded from [3].  
+train_graph_regression.ipynb - This .ipynb file trains a DyGFormer model for the graph regression task with the dataset generated by Dataset.ipynb.  
+train_link_prediction.ipynb - This .ipynb file trains a DyGFormer model for the link predictiont task with the same dataset.  
 
 ## Notes
-We chose not to include the raw fMRI image files (in the format of .nii.gz) in the submission
-since there are 50 raw images each with around the size of 250MB.
-We thought it would take a lot of time to unzip the files and upload it on Google Colab environment.
-Therefore, we omitted the code for loading the raw fMRI image, generating a functional connectivity (FC) matrix and a binary adjacency matrix.
-The .csv files in DG_data folder contains the information of each edge in the binary adjacency matrices.
-If you have any further inquiries about preprocessing fMRI images, please contact Junyup Kim (ytrewq271828@kaist.ac.kr).
+We chose not to include the raw fMRI image files (in the format of .nii.gz) in the submission  
+since there are 50 raw images each with around the size of 250MB.  
+We thought it would take a lot of time to unzip the files and upload it on Google Colab environment.  
+Therefore, we omitted the code for loading the raw fMRI image, generating a functional connectivity (FC) matrix and a binary adjacency matrix.  
+The .csv files in DG_data folder contains the information of each edge in the binary adjacency matrices.  
+If you have any further inquiries about preprocessing fMRI images, please contact Junyup Kim (ytrewq271828@kaist.ac.kr).  
 
 ## References
-[1] Learning dynamic graph representation of brain connectome with spatio-temporal attention, Kim et al., NeurIPS 2021. 
-https://doi.org/10.48550/arXiv.2105.13495
+[1] Learning dynamic graph representation of brain connectome with spatio-temporal attention, Kim et al., NeurIPS 2021.   
+https://doi.org/10.48550/arXiv.2105.13495  
 
-[2] Towards better dynamic graph learning: new architecture and unified library
-Yu et al., NeurIPS 2023.
-https://doi.org/10.48550/arXiv.2303.13047
+[2] Towards better dynamic graph learning: new architecture and unified library  
+Yu et al., NeurIPS 2023.  
+https://doi.org/10.48550/arXiv.2303.13047  
 
-[3] HCP Young Adult Dataset
-https://www.humanconnectome.org/study/hcp-young-adult
+[3] HCP Young Adult Dataset  
+https://www.humanconnectome.org/study/hcp-young-adult  
 
-[4] Mapping Anterior Temporal Lobe Language Areas with FMRI: A Multi-Center Normative Study
-https://doi.org/10.1016/j.neuroimage.2010.09.048
+[4] Mapping Anterior Temporal Lobe Language Areas with FMRI: A Multi-Center Normative Study  
+https://doi.org/10.1016/j.neuroimage.2010.09.048  
 
