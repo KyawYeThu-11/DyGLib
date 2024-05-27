@@ -47,7 +47,7 @@ The goal of this task is to predict the **language task score** (output) of a su
 
 ## Explanation of Directory Structure
 ### Directories
-- `DG_data` - contains the raw dataset in the format of .csv files.  
+- `DG_data` - contains the extracted dataset from raw fMRI images in the format of .csv files.  
 - `models` - contains the models in the format of .py files.  
 - `preprocess_data` - contains the code for preprocessing the raw dataset in DG_data folder.  
 - `processed_data` - contains the preprocessed dataset, which can be directly fed into the graph regression model.
