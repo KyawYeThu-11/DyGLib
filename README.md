@@ -1,7 +1,7 @@
-## KAIST 2024 Spring 
-## CS471: Graph Machine Learning and Mining
-## Project Team #14: Dynamic Brain Connectome Learning
-## 20190169 Junyup Kim & 20220929 Kyaw Ye Thu
+KAIST 2024 Spring 
+CS471: Graph Machine Learning and Mining
+Project Team #14: Dynamic Brain Connectome Learning
+20190169 Junyup Kim & 20220929 Kyaw Ye Thu
 
 ## Introduction
 This project aims to learn brain connectome data via an existing dynamic graph learning method, named DyGFormer[2].
