@@ -111,5 +111,3 @@ ENV/
 .vscode/
 DG_data/*/*
 !DG_data/myket/*
-processed_data/*/*
-!processed_data/myket/*
