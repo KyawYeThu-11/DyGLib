@@ -4,13 +4,15 @@
 ## Introduction
 This project aims to learn brain connectome data via an existing dynamic graph learning method, named DyGFormer [[2](#2)]. We've constructed a functional connectivity (FC) matrix with a functional magnetic resonance imaging (fMRI) images, by slightly modifying the approach in [[1](#1)].
 
+Our implementation is built on top of [DyGFormer repository](https://github.com/yule-BUAA/DyGLib).
+
 ![](./figures/rois.png)
 
-We've conducted two downstream tasks, **link prediction** and **graph regression**.  
+We've conducted two downstream tasks,(1) **link prediction** and (2) **graph regression**.  
 - The result showed that the DyGFormer model successfully predicted the future links in a dynamic graph, even with a novel connectome dataset.  
 - Also, the graph regression task suggested that DyGFormer model can generate a graph embedding that captures the dynamic features of brain connectome data. 
 
-Hence, the novelty of our project are two folds: (1) applying DyGFormer to a novel connectome dataset and (2) extending DyGFormer for graph-level prediction tasks
+Hence, the novelty of our project are two folds: (1) **applying DyGFormer to a novel connectome dataset** and (2) **extending DyGFormer for graph-level prediction tasks**
 
 ## Data Generation
 We've generated dynamic graphs from raw fMRI images. The raw fMRI images are "100 unrelated subjects" version of HCP Young Adult Dataset [[3](#3)]. We specifically downloaded the language task fMRI dataset, which was measured while a subject is conducting a Language Task [[4](#4)]. However, due to the computational cost, we decided to use data from 50 subjects.  
@@ -79,3 +81,7 @@ https://www.humanconnectome.org/study/hcp-young-adult
 
 [<a name="4">4</a>] Mapping Anterior Temporal Lobe Language Areas with FMRI: A Multi-Center Normative Study  
 https://doi.org/10.1016/j.neuroimage.2010.09.048  
+
+## Contributors
+
+This project is the result of equal contributions by Kim Junyup (ytrewq271828@kaist.ac.kr) and Kyaw Ye Thu (kyawyethu@kaist.ac.kr)
